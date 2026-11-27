@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Friends - Leuvenguesser{% endblock %}
+
+{% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/friends.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="friends-shell">
+        <header class="friends-topbar">
+            <a class="brand-link" href="{{ path('game_home') }}">Leuvenguesser</a>
+            <nav>
+                <a href="{{ path('game_home') }}">Home</a>
+            </nav>
+        </header>
+
+        <main class="friends-main">
+            <section class="friends-head">
+                <div>
+                    <h1>Friends</h1>
+                    <p>Accept invitations, compare Leuven, challenge, and duel scores, and grow your leaderboard circle.</p>
+                </div>
+            </section>
+
+            <section class="invitations-panel" data-invitations-panel hidden>
+                <div class="panel-title-row">
+                    <h2>Invitations</h2>
+                </div>
+                <div class="invitations-list" data-invitations-list></div>
+            </section>
+
+            <div class="friends-layout">
+                <section class="friends-panel">
+                    <div class="panel-title-row">
+                        <h2>Your friends</h2>
+                        <span class="friends-count" data-friends-count>0</span>
+                    </div>
+                    <div class="friends-list" data-friends-list>
+                        <div class="empty-state">Loading friends…</div>
+                    </div>
+                </section>
+
+                <aside class="discover-panel">
+                    <h2>Find friends</h2>
+                    <input
+                        type="search"
+                        class="friends-search"
+                        placeholder="Search by username"
+                        data-friends-search
+                        autocomplete="off"
+                    >
+                    <div class="discover-section">
+                        <h3 data-discover-title>Suggested players</h3>
+                        <div class="discover-list" data-discover-list>
+                            <div class="empty-state">Loading suggestions…</div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.APP_API = {
+            prefix: {{ app.request.basePath|json_encode|raw }},
+            urls: {
+                '/api/friends': {{ path('api_friends_list')|json_encode|raw }},
+                '/api/friends/search': {{ path('api_friends_search')|json_encode|raw }},
+                '/api/friends/suggestions': {{ path('api_friends_suggestions')|json_encode|raw }},
+                '/api/friends/notifications/count': {{ path('api_friends_notifications_count')|json_encode|raw }}
+            }
+        };
+        window.FriendsConfig = {
+            homeUrl: {{ path('game_home')|json_encode|raw }},
+            inviteUrl: {{ path('api_friends_invite')|json_encode|raw }},
+            acceptInviteUrl: {{ path('api_friends_invite_accept', { invitationId: 0 })|json_encode|raw }}
+        };
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/friends.js') }}"></script>
+{% endblock %}

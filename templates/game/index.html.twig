@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Leuvenguesser - Team 408{% endblock %}
+
+{% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/leaflet/leaflet.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/game.css') }}">
+{% endblock %}
+
+{% block body %}
+    <button id="exit-game-btn" aria-label="Exit game">✕ Exit</button>
+
+    <div id="exit-confirm-modal" class="exit-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="exit-modal-title">
+        <div class="exit-modal">
+            <h2 id="exit-modal-title">Exit Game?</h2>
+            <p>Your current progress will be lost and this round's record will not be saved.</p>
+            <div class="exit-modal-actions">
+                <button id="exit-cancel-btn">Cancel</button>
+                <button id="exit-confirm-btn">Yes, Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-top-bar" class="hidden">
+        <div class="stat-group">
+            <span class="stat-label">DISTANCE</span>
+            <span id="res-distance" class="stat-value cyan-text">0 km</span>
+        </div>
+        <div class="stat-group">
+            <span class="stat-label">SCORE</span>
+            <span id="res-score" class="stat-value orange-text">0</span>
+            <span class="stat-max">/ 1000</span>
+        </div>
+    </div>
+
+    <div id="round-indicator" class="hidden"></div>
+
+    <div id="timer-box">
+        <span id="time-display">00:30</span>
+    </div>
+
+    <div class="game-container" id="main-container">
+        <div class="image-section" id="image-panel">
+            <img id="location-image" src="" alt="Loading location photo…">
+        </div>
+
+        <div class="map-section" id="map-panel">
+            <div id="map"></div>
+            <button id="guess-button" disabled>Confirm Guess</button>
+        </div>
+    </div>
+
+    <div id="result-bottom-bar" class="hidden">
+        <a href="{{ path('game_home') }}" id="home-btn">Home</a>
+        <button id="next-round-btn">Play Again</button>
+        <button id="share-round-result-btn">Share result</button>
+    </div>
+
+    <div class="modal-backdrop" data-polling-modal hidden>
+        <div class="polling-modal" role="dialog" aria-modal="true" aria-labelledby="polling-modal-title">
+            <div class="modal-header">
+                <div>
+                    <h2 id="polling-modal-title">Waiting for the other player...</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="matched-modal-backdrop hidden" data-matched-modal hidden>
+        <div class="matched-modal" role="dialog" aria-modal="true" aria-labelledby="matched-modal-title">
+            <div class="matched-modal-header">
+                <div>
+                    <h2 id="matched-modal-title">Matched with a player</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="final-screen" class="hidden">
+        <h2 class="final-title">Leuven Challenge Complete!</h2>
+        <div class="final-total" id="final-total-score">0</div>
+        <div class="final-total-label">OUT OF <span id="final-max-score">5000</span></div>
+        <div id="final-pb-banner" class="hidden"></div>
+        <div class="final-round-breakdown" id="final-round-breakdown"></div>
+        <div class="final-rankings">
+            <h3>Top Scores</h3>
+            <div id="final-rankings-list"></div>
+        </div>
+        <div class="final-actions">
+            <a href="{{ path('game_home') }}" class="final-btn secondary">Home</a>
+            <button class="final-btn primary" onclick="location.reload()">Play Again</button>
+            <button id="share-game-result-btn">Share result</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/leaflet/leaflet.js') }}"></script>
+    <script>
+        window.APP_API = {
+            prefix: {{ app.request.basePath|json_encode|raw }},
+            urls: {
+                '/api/game/round': {{ path('api_game_round')|json_encode|raw }},
+                '/api/game/guess': {{ path('api_game_guess')|json_encode|raw }},
+                '/api/game/daily/finish': {{ path('api_game_daily_finish')|json_encode|raw }},
+                '/api/game/daily/rankings': {{ path('api_game_daily_rankings')|json_encode|raw }},
+                '/api/game/challenge/finish': {{ path('api_game_challenge_finish')|json_encode|raw }},
+                '/api/game/challenge/rankings': {{ path('api_game_challenge_rankings')|json_encode|raw }}
+            }
+        };
+        window.GAME_CONFIG = {
+            apiRoundUrl: {{ path('api_game_round')|json_encode|raw }},
+            apiGuessUrl: {{ path('api_game_guess')|json_encode|raw }},
+            apiFindDuelUrl: {{ path('api_game_find_duel')|json_encode|raw }},
+            apiDailyFinishUrl: {{ path('api_game_daily_finish')|json_encode|raw }},
+            apiDailyRankingsUrl: {{ path('api_game_daily_rankings')|json_encode|raw }},
+            apiChallengeFinishUrl: {{ path('api_game_challenge_finish')|json_encode|raw }},
+            apiChallengeRankingsUrl: {{ path('api_game_challenge_rankings')|json_encode|raw }},
+            apiDuelFinishUrl: {{path('api_game_duel_finish')|json_encode|raw}},
+            apiPollDuelFinishUrl: {{path('api_game_duel_finish_poll')|json_encode|raw }},
+            imageBaseUrl: {{ asset('images/')|json_encode|raw }},
+            markerShadowUrl: {{ asset('assets/leaflet/images/marker-shadow.png')|json_encode|raw }},
+            homeUrl: {{ path('game_home')|json_encode|raw }}
+        };
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/game.js') }}"></script>
+{% endblock %}

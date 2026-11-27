@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - Leuvenguesser{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/challenges.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="challenge-shell">
+        <header class="challenge-topbar">
+            <a class="brand-link" href="{{ path('game_home') }}">Leuvenguesser</a>
+            <nav>
+                <a href="{{ path('game_home') }}">Home</a>
+            </nav>
+        </header>
+
+        <main class="challenge-main admin-main">
+            <section class="hub-head">
+                <div>
+                    <h1>Admin</h1>
+                    <p data-admin-session>Checking admin session...</p>
+                </div>
+                <button class="primary-action" type="button" data-admin-refresh>Refresh</button>
+            </section>
+
+            <section class="admin-login-panel" data-admin-login hidden>
+                <form class="modal-form admin-login-form" data-admin-login-form>
+                    <input name="name" type="text" maxlength="45" placeholder="Admin username" autocomplete="username" required>
+                    <input name="password" type="password" minlength="6" placeholder="Password" autocomplete="current-password" required>
+                    <div class="modal-actions">
+                        <span data-admin-login-status></span>
+                        <button class="primary-action" type="submit">Log In</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="filter-bar" data-admin-controls hidden>
+                <input type="search" placeholder="Search title or description" data-admin-search>
+                <input type="search" placeholder="Author" data-admin-author>
+                <input type="search" placeholder="Region" data-admin-region>
+                <select data-admin-status>
+                    <option value="all">All statuses</option>
+                    <option value="published">Published</option>
+                    <option value="hidden">Hidden</option>
+                </select>
+                <select data-admin-sort>
+                    <option value="newest">Newest</option>
+                    <option value="popular">Most popular</option>
+                    <option value="trending">24h rising</option>
+                    <option value="most_played">Most played</option>
+                    <option value="most_liked">Most liked</option>
+                </select>
+            </section>
+
+            <section class="admin-summary-grid" data-admin-summary hidden>
+                <article class="creator-card">
+                    <span class="metric-pill">Challenge Sets</span>
+                    <h2 data-admin-challenge-count>0</h2>
+                </article>
+                <article class="creator-card">
+                    <span class="metric-pill">Hidden Sets</span>
+                    <h2 data-admin-hidden-count>0</h2>
+                </article>
+                <article class="creator-card">
+                    <span class="metric-pill">Users</span>
+                    <h2 data-admin-user-count>0</h2>
+                </article>
+            </section>
+
+            <section class="challenge-grid" data-admin-list>
+                <div class="empty-state">Admin login required.</div>
+            </section>
+        </main>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.APP_API = {
+            prefix: {{ app.request.basePath|json_encode|raw }},
+            urls: {
+                '/api/auth/login': {{ path('api_auth_login')|json_encode|raw }},
+                '/api/admin/me': {{ path('api_admin_me')|json_encode|raw }},
+                '/api/admin/challenges': {{ path('api_admin_challenges')|json_encode|raw }},
+                '/api/admin/users': {{ path('api_admin_users')|json_encode|raw }}
+            }
+        };
+        window.AdminConfig = {
+            playUrl: {{ path('game_play')|json_encode|raw }}
+        };
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/adminCenter.js') }}"></script>
+{% endblock %}

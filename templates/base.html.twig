@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Leuvenguesser - Team 408{% endblock %}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+{% block body %}{% endblock %}
+<script>
+    window.Leuvenguesser = window.Leuvenguesser || {};
+    window.Leuvenguesser.basePath = {{ app.request.basePath|json_encode|raw }};
+</script>
+<script src="{{ asset('js/adminNav.js') }}"></script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Creator Center - Leuvenguesser{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/leaflet/leaflet.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/challenges.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="challenge-shell">
+        <header class="challenge-topbar">
+            <a class="brand-link" href="{{ path('game_home') }}">Leuvenguesser</a>
+            <nav>
+                <a href="{{ path('game_home') }}">Home</a>
+                <a href="{{ path('challenge_hub') }}">Challenge Hub</a>
+                <a class="is-active" href="{{ path('creator_center') }}">Creator Center</a>
+            </nav>
+        </header>
+
+        <main class="challenge-main creator-layout creator-layout-single">
+            <section class="creator-panel">
+                <div class="section-head">
+                    <div>
+                        <h1>Creator Center</h1>
+                        <p>Your Challenge Sets</p>
+                    </div>
+                    <div class="creator-action-buttons">
+                        <a class="secondary-action" href="{{ path('game_home') }}?publish=1">Publish New</a>
+                        <button class="secondary-action" type="button" data-refresh-mine>Refresh</button>
+                    </div>
+                </div>
+                <div class="creator-list" data-creator-list>
+                    <div class="empty-state">Loading your challenge sets...</div>
+                </div>
+
+                <div class="stats-panel">
+                    <div class="section-head">
+                        <h2>7 Day Play Overview</h2>
+                        <span data-selected-title></span>
+                    </div>
+                    <canvas width="720" height="260" data-stats-canvas></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.APP_API = {
+            prefix: {{ app.request.basePath|json_encode|raw }},
+            urls: {
+                '/api/challenges/mine': {{ path('api_challenges_mine')|json_encode|raw }},
+                '/api/challenges/regions/resolve': {{ path('api_challenges_regions_resolve')|json_encode|raw }}
+            }
+        };
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('assets/leaflet/leaflet.js') }}"></script>
+    <script src="{{ asset('js/creatorCenter.js') }}"></script>
+{% endblock %}

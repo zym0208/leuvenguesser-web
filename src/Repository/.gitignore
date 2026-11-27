@@ -1,0 +1,7 @@
+*
+!.gitignore
+!ChallengeRepository.php
+!GameResultRepository.php
+!LocationRepository.php
+!RegionRepository.php
+!UserRepository.php

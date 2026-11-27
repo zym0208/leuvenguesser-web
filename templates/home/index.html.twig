@@ -1,0 +1,346 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Leuvenguesser{% endblock %}
+
+{% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.127.0/Build/Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" href="{{ asset('assets/leaflet/leaflet.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="home-shell">
+        <div class="starfield"></div>
+
+        <div class="page-frame">
+            <header class="topbar">
+                <div class="brand-group">
+                    <button class="icon-button mobile-only" type="button" data-mobile-menu-toggle aria-label="Toggle navigation">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    <div class="brand-badge">LG</div>
+
+                    <div class="brand-copy">
+                        <div class="brand-title">Leuvenguesser</div>
+                    </div>
+                </div>
+
+                <nav class="topnav desktop-nav">
+                    <button class="pill is-active" type="button">Home</button>
+                    <a class="pill" href="{{ path('challenge_hub') }}">Challenge Hub</a>
+                    <a class="pill" href="{{ path('creator_center') }}">Creator Center</a>
+                    <button class="pill" type="button" data-open-rankings-modal>Rankings</button>
+                </nav>
+
+                <div class="topbar-actions">
+                    <button class="pill subtle desktop-only friends-nav-link" type="button" data-open-friends data-friends-nav hidden>Friends</button>
+                    <a class="pill subtle desktop-only" href="{{ path('admin_center') }}" data-admin-topbar hidden>Admin</a>
+                    <button class="pill subtle" type="button" data-login-btn data-open-auth-modal>Log In</button>
+                    <div class="topbar-user" data-user-display hidden>
+                        <span class="topbar-username" data-user-name></span>
+                        <button class="pill subtle" type="button" data-logout>Log Out</button>
+                    </div>
+                    <button class="pill cta" type="button" data-open-mode-modal>Play Now</button>
+                </div>
+            </header>
+
+            <div class="mobile-menu" data-mobile-menu hidden>
+                <button class="mobile-link" type="button">Home</button>
+                <a class="mobile-link" href="{{ path('challenge_hub') }}">Challenge Hub</a>
+                <a class="mobile-link" href="{{ path('creator_center') }}">Creator Center</a>
+                <button class="mobile-link" type="button" data-open-rankings-modal>Rankings</button>
+                <button class="mobile-link friends-nav-link" type="button" data-open-friends data-friends-nav hidden>Friends</button>
+                <a class="mobile-link" href="{{ path('admin_center') }}" data-admin-topbar hidden>Admin</a>
+            </div>
+
+            <main class="main-stage">
+                <section class="stage-card">
+                    <div class="stage-glow"></div>
+
+                    <div class="hero-header">
+                        <div class="hero-copy">
+                            <h1>Guess where. Beat the world.</h1>
+                        </div>
+
+                    </div>
+
+                    <div class="globe-stage">
+                        <div class="orbital-glow"></div>
+
+                        <div class="globe-shell">
+                            <div class="token-warning" data-token-warning {% if cesium_token %}hidden{% endif %}>
+                                Add a valid `CESIUM_TOKEN` to load the interactive globe.
+                            </div>
+
+                            <div id="cesium-globe" class="globe-canvas" aria-label="Cesium globe"></div>
+                            <div class="marker-overlay" data-marker-overlay></div>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <button class="hero-button primary" type="button" data-open-mode-modal>Start Playing</button>
+                        <button class="hero-button secondary" type="button" data-open-publish-modal>Publish Challenge</button>
+                    </div>
+
+                    <aside class="side-panel" data-side-panel>
+                        <div class="panel-header">
+                            <div class="panel-nav-tabs">
+                                <button class="panel-nav-tab is-active" type="button" data-panel-nav="modes">Modes</button>
+                                <button class="panel-nav-tab" type="button" data-panel-nav="regions">Regions</button>
+                            </div>
+                            <button class="icon-button" type="button" data-panel-toggle aria-label="Collapse panel">
+                                <span class="icon-close"></span>
+                            </button>
+                        </div>
+
+                        <section class="panel-section is-active" data-panel-section="modes">
+                            <div data-modes-list>
+                                <button class="panel-entry-card is-available" type="button" data-show-mode="leuven">
+                                    <div class="panel-entry-info">
+                                        <h3>Leuven Challenge</h3>
+                                        <p>Guess locations around Leuven with daily streak tracking and a live leaderboard.</p>
+                                    </div>
+                                    <span class="panel-entry-badge">Available</span>
+                                </button>
+                                <button class="panel-entry-card is-available" type="button" data-show-mode="world">
+                                    <div class="panel-entry-info">
+                                        <h3>World Challenge</h3>
+                                        <p>Choose a region or community challenge set and play with matching map bounds.</p>
+                                    </div>
+                                    <span class="panel-entry-badge">Available</span>
+                                </button>
+                                <button class="panel-entry-card is-available duel-menu" type="button" data-show-mode="duel">
+                                    <div class="panel-entry-info">
+                                        <h3>Duel Challenge</h3>
+                                        <p>Head-to-head live battles with fast rounds and direct score comparison.</p>
+                                    </div>
+                                    <span class="panel-entry-badge duel-status">Available</span>
+                                </button>
+                            </div>
+                            <div class="panel-detail" data-mode-detail hidden>
+                                <button class="panel-back" type="button" data-panel-back="modes">‹ Back</button>
+                                <div data-mode-detail-body></div>
+                            </div>
+                        </section>
+
+                        <section class="panel-section" data-panel-section="regions">
+                            <div data-regions-list>
+                                <div class="panel-loading">Loading regions…</div>
+                            </div>
+                            <div class="panel-detail" data-region-detail hidden>
+                                <button class="panel-back" type="button" data-panel-back="regions">‹ Back</button>
+                                <div data-region-detail-body></div>
+                            </div>
+                        </section>
+                    </aside>
+
+                    <button class="panel-reopen" type="button" data-panel-reopen hidden>Show Panel</button>
+                </section>
+            </main>
+        </div>
+
+        <div class="modal-backdrop" data-auth-modal hidden>
+            <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="auth-modal-title" data-auth-title>Log In</h2>
+                        <p data-auth-subtitle>Welcome back — enter your details below.</p>
+                    </div>
+                    <button class="icon-button" type="button" data-close-auth-modal aria-label="Close auth dialog">
+                        <span class="icon-close"></span>
+                    </button>
+                </div>
+
+                <form class="auth-form" data-login-form novalidate>
+                    <div class="auth-error" data-login-error></div>
+                    <input class="auth-input" name="name" type="text" placeholder="Username" autocomplete="username" required maxlength="45">
+                    <input class="auth-input" name="password" type="password" placeholder="Password" autocomplete="current-password" required>
+                    <button class="hero-button primary auth-submit" type="submit">Log In</button>
+                    <p class="auth-switch">No account yet? <button type="button" data-to-signup>Create one</button></p>
+                </form>
+
+                <form class="auth-form" data-signup-form novalidate hidden>
+                    <div class="auth-error" data-signup-error></div>
+                    <input class="auth-input" name="name" type="text" placeholder="Choose a username" autocomplete="username" required maxlength="45">
+                    <input class="auth-input" name="password" type="password" placeholder="Password (min. 6 characters)" autocomplete="new-password" required>
+                    <button class="hero-button primary auth-submit" type="submit">Create Account</button>
+                    <p class="auth-switch">Already have an account? <button type="button" data-to-login>Log in</button></p>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-backdrop" data-rankings-modal hidden>
+            <div class="rankings-modal" role="dialog" aria-modal="true" aria-labelledby="rankings-modal-title">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="rankings-modal-title">Rankings</h2>
+                        <p>Top 10 players per game mode</p>
+                    </div>
+                    <button class="icon-button" type="button" data-close-rankings-modal aria-label="Close rankings">
+                        <span class="icon-close"></span>
+                    </button>
+                </div>
+                <div class="rankings-tabs">
+                    <button class="rankings-tab is-active" type="button" data-rankings-tab="leuven">Leuven</button>
+                    <button class="rankings-tab" type="button" data-rankings-tab="world">World</button>
+                    <button class="rankings-tab" type="button" data-rankings-tab="duel">Duel</button>
+                </div>
+                <div class="rankings-list" data-rankings-list>
+                    <div class="rankings-loading">Loading…</div>
+                </div>
+                <div id="ranking-you"></div>
+            </div>
+        </div>
+
+        <div class="modal-backdrop" data-mode-modal hidden>
+            <div class="mode-modal" role="dialog" aria-modal="true" aria-labelledby="mode-modal-title">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="mode-modal-title">Choose a Mode</h2>
+                        <p>
+                            Starting a session sends the player into the active challenge flow. Right now only Daily Challenge is live.
+                        </p>
+                    </div>
+                    <button class="icon-button" type="button" data-close-mode-modal aria-label="Close mode dialog">
+                        <span class="icon-close"></span>
+                    </button>
+                </div>
+
+                <div class="mode-list">
+                    <a class="mode-card is-available" href="{{ path('game_play') }}">
+                        <div>
+                            <h3>Leuven Challenge</h3>
+                            <p>One curated map each day with streak tracking and leaderboard pressure.</p>
+                        </div>
+                        <span>Available</span>
+                    </a>
+
+                    <a class="mode-card is-available" href="{{ path('challenge_hub') }}">
+                        <div>
+                            <h3>World Challenge</h3>
+                            <p>Choose a region or community challenge set and play with matching map bounds.</p>
+                        </div>
+                        <span>Available</span>
+                    </a>
+
+                    <a class="mode-card is-available duel-menu" href="{{ path('game_play') }}?mode=duel">
+                        <div>
+                            <h3>Duel Challenge</h3>
+                            <p>Head-to-head live battles with fast rounds and direct score comparison.</p>
+                        </div>
+                        <span class="duel-status">Available</span>
+                    </a>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="hero-button tertiary" type="button" data-close-mode-modal>Maybe Later</button>
+                    <a class="hero-button primary" href="{{ path('game_play') }}">Enter Leuven Challenge</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-backdrop" data-publish-modal hidden>
+            <div class="publish-modal" role="dialog" aria-modal="true" aria-labelledby="publish-modal-title">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="publish-modal-title">Publish Challenge</h2>
+                        <p>Create a challenge set from multiple images, each with its own answer point.</p>
+                    </div>
+                    <button class="icon-button" type="button" data-close-publish-modal aria-label="Close publish dialog">
+                        <span class="icon-close"></span>
+                    </button>
+                </div>
+
+                <form class="publish-form" data-publish-form enctype="multipart/form-data" novalidate>
+                    <div class="publish-upload">
+                        <label class="publish-label" for="publish-count">Number of images</label>
+                        <input id="publish-count" class="publish-text-input" name="imageCount" type="number" min="1" max="10" step="1" placeholder="1-10" data-publish-count>
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-publish-file-picker hidden>
+                        <div class="publish-preview" data-publish-preview>
+                            <span>Choose how many images to upload</span>
+                        </div>
+                    </div>
+
+                    <div class="publish-location">
+                        <label class="publish-label" for="publish-title">Details</label>
+                        <input id="publish-title" class="publish-text-input" name="title" type="text" maxlength="120" placeholder="Challenge set title" required>
+                        <textarea class="publish-textarea" name="description" maxlength="1200" placeholder="Short description"></textarea>
+                        <input class="publish-text-input" name="authorName" type="text" maxlength="90" placeholder="Author" readonly data-publish-author>
+                        <input class="publish-text-input" name="regionDisplay" type="text" maxlength="90" placeholder="Region will be generated from all answer points" readonly data-publish-region-name>
+                        <input name="regionId" type="hidden" data-publish-region-id>
+                        <input name="regionLat" type="hidden" data-publish-region-lat>
+                        <input name="regionLng" type="hidden" data-publish-region-lng>
+                        <input name="regionSwLat" type="hidden" data-publish-region-sw-lat>
+                        <input name="regionSwLng" type="hidden" data-publish-region-sw-lng>
+                        <input name="regionNeLat" type="hidden" data-publish-region-ne-lat>
+                        <input name="regionNeLng" type="hidden" data-publish-region-ne-lng>
+                        <label class="publish-label">Answer point for selected image</label>
+                        <div class="publish-map" data-publish-map></div>
+                        <div class="publish-photo-list" data-publish-photo-list></div>
+                        <div class="coordinate-row">
+                            <label>
+                                <span>Latitude</span>
+                                <input name="lat[]" type="number" step="0.000001" min="-90" max="90" required data-publish-lat>
+                            </label>
+                            <label>
+                                <span>Longitude</span>
+                                <input name="lng[]" type="number" step="0.000001" min="-180" max="180" required data-publish-lng>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="publish-actions">
+                        <div class="publish-status" data-publish-status aria-live="polite"></div>
+                        <div class="modal-actions compact">
+                            <button class="hero-button tertiary" type="button" data-close-publish-modal>Cancel</button>
+                            <button class="hero-button primary" type="submit" data-publish-submit>Publish</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.APP_API = {
+            prefix: {{ app.request.basePath|json_encode|raw }},
+            urls: {
+                '/api/auth/login': {{ path('api_auth_login')|json_encode|raw }},
+                '/api/auth/signup': {{ path('api_auth_signup')|json_encode|raw }},
+                '/api/game/rankings': {{ path('api_game_rankings')|json_encode|raw }},
+                '/api/game/daily/rankings': {{ path('api_game_daily_rankings')|json_encode|raw }},
+                '/api/challenges': {{ path('api_challenges_list')|json_encode|raw }},
+                '/api/challenges/regions': {{ path('api_challenges_regions')|json_encode|raw }},
+                '/api/challenges/regions/resolve': {{ path('api_challenges_regions_resolve')|json_encode|raw }},
+                '/api/friends/notifications/count': {{ path('api_friends_notifications_count')|json_encode|raw }}
+            }
+        };
+        window.CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@1.127.0/Build/Cesium/';
+        window.FriendsNavConfig = {
+            friendsUrl: {{ path('friends')|json_encode|raw }},
+            homeUrl: {{ path('game_home')|json_encode|raw }},
+            notificationsUrl: {{ path('api_friends_notifications_count')|json_encode|raw }}
+        };
+        window.StarGlobeConfig = {
+            cesiumToken: {{ cesium_token|json_encode|raw }},
+            playUrl: {{ path('game_play')|json_encode|raw }},
+            challengeHubUrl: {{ path('challenge_hub')|json_encode|raw }},
+            duelUrl: {{ path('game_play')|json_encode|raw }},
+            publishChallengeUrl: {{ path('api_game_challenge_publish')|json_encode|raw }},
+            markerLocations: {{ globe_markers|json_encode|raw }}
+        };
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/friendsNav.js') }}"></script>
+    <script src="{{ asset('assets/leaflet/leaflet.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cesium@1.127.0/Build/Cesium/Cesium.js"></script>
+    <script src="{{ asset('js/home.js') }}"></script>
+{% endblock %}

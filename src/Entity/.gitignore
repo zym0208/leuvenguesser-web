@@ -1,0 +1,5 @@
+*
+!.gitignore
+!GameResult.php
+!GameResultRound.php
+!User.php

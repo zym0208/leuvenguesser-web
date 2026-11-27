@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Challenge Hub - Leuvenguesser{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/challenges.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="challenge-shell">
+        <header class="challenge-topbar">
+            <a class="brand-link" href="{{ path('game_home') }}">Leuvenguesser</a>
+            <nav>
+                <a href="{{ path('game_home') }}">Home</a>
+                <a class="is-active" href="{{ path('challenge_hub') }}">Challenge Hub</a>
+                <a href="{{ path('creator_center') }}">Creator Center</a>
+            </nav>
+        </header>
+
+        <main class="challenge-main">
+            <section class="hub-head">
+                <div>
+                    <h1>Challenge Hub</h1>
+                    <p>Find community challenge sets by region, author, popularity, and recent momentum.</p>
+                </div>
+                <a class="primary-action" href="{{ path('creator_center') }}">Publish Set</a>
+            </section>
+
+            <section class="filter-bar">
+                <input type="search" placeholder="Search title or description" data-hub-search>
+                <input type="search" placeholder="Author" data-hub-author>
+                <select data-hub-region>
+                    <option value="">All regions</option>
+                </select>
+                <select data-hub-sort>
+                    <option value="recommended">Recommended</option>
+                    <option value="popular">Most popular</option>
+                    <option value="trending">24h rising</option>
+                    <option value="newest">Newest</option>
+                    <option value="most_played">Most played</option>
+                    <option value="most_liked">Most liked</option>
+                </select>
+            </section>
+
+            <section class="challenge-grid" data-hub-list>
+                <div class="empty-state">Loading challenge sets...</div>
+            </section>
+        </main>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.APP_API = {
+            prefix: {{ app.request.basePath|json_encode|raw }},
+            urls: {
+                '/api/challenges/regions': {{ path('api_challenges_regions')|json_encode|raw }}
+            }
+        };
+        window.ChallengeHubConfig = {
+            playUrl: {{ path('game_play')|json_encode|raw }}
+        };
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/challengeHub.js') }}"></script>
+{% endblock %}
